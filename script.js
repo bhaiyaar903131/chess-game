@@ -154,6 +154,11 @@ function canLand(piece, x, y) {
 function getMoves(piece) {
     switch (piece.type) {
         case "pawn": return pawnMoves(piece);
+        case "rook": return rookMoves(piece);
+        case "bishop": return bishopMoves(piece);
+        case "queen": return queenMoves(piece);
+        case "knight": return knightMoves(piece);
+        case "king": return kingMoves(piece);
         default: return [];
     }
 }
@@ -270,6 +275,83 @@ function pawnMoves(piece) {
             moves.push({ x: targetX, y: nextY });
         }
     });
+
+    return moves;
+}
+
+
+function rayMoves(piece, directions) {
+    const moves = [];
+
+    directions.forEach(([stepX, stepY]) => {
+        let x = piece.x + stepX;
+        let y = piece.y + stepY;
+
+        while (insideBoard(x, y)) {
+            const occupant = pieceAt(x, y);
+
+            if (!occupant) {
+                moves.push({ x, y });
+            } else {
+                if (occupant.color !== piece.color) {
+                    moves.push({ x, y });
+                }
+                break;
+            }
+
+            x += stepX;
+            y += stepY;
+        }
+    });
+
+    return moves;
+}
+
+function rookMoves(piece) {
+    return rayMoves(piece, [[1, 0], [-1, 0], [0, 1], [0, -1]]);
+}
+
+
+function bishopMoves(piece) {
+    return rayMoves(piece, [[1, 1], [1, -1], [-1, 1], [-1, -1]]);
+}
+
+function queenMoves(piece) {
+    return rayMoves(piece, [
+        [1, 0], [-1, 0], [0, 1], [0, -1],
+        [1, 1], [1, -1], [-1, 1], [-1, -1]
+    ]);
+}
+
+
+function knightMoves(piece) {
+    const offsets = [
+        [1, 2], [2, 1], [2, -1], [1, -2],
+        [-1, -2], [-2, -1], [-2, 1], [-1, 2]
+    ];
+
+    return offsets
+        .map(([offsetX, offsetY]) => ({ x: piece.x + offsetX, y: piece.y + offsetY }))
+        .filter((move) => canLand(piece, move.x, move.y));
+}
+
+function kingMoves(piece) {
+    const moves = [];
+
+    for (let offsetX = -1; offsetX <= 1; offsetX += 1) {
+        for (let offsetY = -1; offsetY <= 1; offsetY += 1) {
+            if (offsetX === 0 && offsetY === 0) {
+                continue;
+            }
+
+            const x = piece.x + offsetX;
+            const y = piece.y + offsetY;
+
+            if (canLand(piece, x, y)) {
+                moves.push({ x, y });
+            }
+        }
+    }
 
     return moves;
 }
