@@ -119,3 +119,44 @@ body {
     background: #5cb85c;
     color: #fff;
 }
+
+.gamecell.last-move {
+    box-shadow: inset 0 0 0 4px rgba(242, 182, 50, 0.7);
+}
+
+.gamecell.capture-target::after {
+    content: "";
+    width: 72%;
+    height: 72%;
+    border: 4px solid rgba(125, 0, 0, 0.7);
+    border-radius: 50%;
+    position: absolute;
+}
+
+.gamecell {
+    position: relative;
+}
+
+#restart {
+    display: block;
+    min-width: 130px;
+    margin: 12px auto 0;
+    padding: 9px 18px;
+    border: 1px solid #111;
+    border-radius: 5px;
+    background: #fff;
+    color: #111;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 3px 0 #222;
+    transition: transform 0.14s ease, box-shadow 0.14s ease, background-color 0.2s ease;
+}
+
+#restart:hover {
+    background: #e9e9e9;
+}
+
+#restart:active {
+    transform: translateY(3px);
+    box-shadow: 0 0 0 #222;
+}
