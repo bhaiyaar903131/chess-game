@@ -131,3 +131,36 @@ function renderPieces() {
 
 pieces = createStartingPieces();
 renderPieces();
+
+
+let selectedPiece = null;
+
+function clearSelection() {
+    selectedPiece = null;
+    document.querySelectorAll(".gamecell").forEach((cell) => {
+        cell.classList.remove("selected", "green");
+    });
+}
+
+function handleSelection(event) {
+    const cell = event.target.closest(".gamecell");
+    if (!cell) {
+        return;
+    }
+
+    const x = Number(cell.dataset.x);
+    const y = Number(cell.dataset.y);
+    const piece = pieceAt(x, y);
+
+    clearSelection();
+
+    if (!piece || piece.color !== currentTurn) {
+        return;
+    }
+
+    selectedPiece = piece;
+    cell.classList.add("selected");
+    turnElement.textContent = `${piece.color === "white" ? "White" : "Black"} ${piece.type} selected`;
+}
+
+boardElement.addEventListener("click", handleSelection);
