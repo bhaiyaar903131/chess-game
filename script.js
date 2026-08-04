@@ -134,15 +134,90 @@ renderPieces();
 
 
 let selectedPiece = null;
+let legalTargets = [];
+let capturedPieces = [];
+let lastMove = null;
 
-function clearSelection() {
-    selectedPiece = null;
+function insideBoard(x, y) {
+    return x >= 1 && x <= 8 && y >= 1 && y <= 8;
+}
+
+function canLand(piece, x, y) {
+    if (!insideBoard(x, y)) {
+        return false;
+    }
+
+    const occupant = pieceAt(x, y);
+    return !occupant || occupant.color !== piece.color;
+}
+
+function getMoves(piece) {
+    switch (piece.type) {
+        case "pawn": return pawnMoves(piece);
+        default: return [];
+    }
+}
+
+function clearHighlights() {
     document.querySelectorAll(".gamecell").forEach((cell) => {
-        cell.classList.remove("selected", "green");
+        cell.classList.remove("selected", "green", "capture-target");
     });
 }
 
-function handleSelection(event) {
+function showMoves(piece) {
+    clearHighlights();
+    legalTargets = getMoves(piece);
+
+    const selectedCell = document.getElementById(squareKey(piece.x, piece.y));
+    selectedCell.classList.add("selected");
+    legalTargets.forEach((move) => {
+        const cell = document.getElementById(squareKey(move.x, move.y));
+        cell.classList.add("green");
+
+        if (pieceAt(move.x, move.y)) {
+            cell.classList.add("capture-target");
+        }
+    });
+}
+
+function targetMove(x, y) {
+    return legalTargets.find((move) => move.x === x && move.y === y) || null;
+}
+
+function flashTurn() {
+    turnElement.classList.add("turnhighlight");
+    window.setTimeout(() => turnElement.classList.remove("turnhighlight"), 420);
+}
+
+function updateTurnText() {
+    turnElement.textContent = `It's ${currentTurn === "white" ? "Whites" : "Blacks"} Turn!`;
+}
+
+function finishMove(piece, move) {
+    const previous = { x: piece.x, y: piece.y };
+    const captured = pieceAt(move.x, move.y);
+
+    if (captured) {
+        captured.captured = true;
+        captured.capturedBy = piece.color;
+        capturedPieces.push(captured);
+    }
+
+    piece.x = move.x;
+    piece.y = move.y;
+    piece.moved = true;
+    lastMove = { from: previous, to: { x: piece.x, y: piece.y } };
+
+    currentTurn = currentTurn === "white" ? "black" : "white";
+    selectedPiece = null;
+    legalTargets = [];
+    clearHighlights();
+    renderPieces();
+    updateTurnText();
+    flashTurn();
+}
+
+function handleBoardClick(event) {
     const cell = event.target.closest(".gamecell");
     if (!cell) {
         return;
@@ -150,17 +225,51 @@ function handleSelection(event) {
 
     const x = Number(cell.dataset.x);
     const y = Number(cell.dataset.y);
-    const piece = pieceAt(x, y);
+    const clickedPiece = pieceAt(x, y);
+    const move = selectedPiece ? targetMove(x, y) : null;
 
-    clearSelection();
-
-    if (!piece || piece.color !== currentTurn) {
+    if (selectedPiece && move) {
+        finishMove(selectedPiece, move);
         return;
     }
 
-    selectedPiece = piece;
-    cell.classList.add("selected");
-    turnElement.textContent = `${piece.color === "white" ? "White" : "Black"} ${piece.type} selected`;
+    if (clickedPiece && clickedPiece.color === currentTurn) {
+        selectedPiece = clickedPiece;
+        showMoves(clickedPiece);
+        return;
+    }
+
+    selectedPiece = null;
+    legalTargets = [];
+    clearHighlights();
+    updateTurnText();
 }
 
-boardElement.addEventListener("click", handleSelection);
+boardElement.addEventListener("click", handleBoardClick);
+
+
+function pawnMoves(piece) {
+    const moves = [];
+    const direction = piece.color === "white" ? 1 : -1;
+    const nextY = piece.y + direction;
+
+    if (insideBoard(piece.x, nextY) && !pieceAt(piece.x, nextY)) {
+        moves.push({ x: piece.x, y: nextY });
+
+        const twoY = piece.y + direction * 2;
+        if (!piece.moved && insideBoard(piece.x, twoY) && !pieceAt(piece.x, twoY)) {
+            moves.push({ x: piece.x, y: twoY });
+        }
+    }
+
+    [-1, 1].forEach((offset) => {
+        const targetX = piece.x + offset;
+        const target = pieceAt(targetX, nextY);
+
+        if (target && target.color !== piece.color) {
+            moves.push({ x: targetX, y: nextY });
+        }
+    });
+
+    return moves;
+}
