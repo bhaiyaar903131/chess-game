@@ -219,6 +219,7 @@ function finishMove(piece, move) {
     clearHighlights();
     renderPieces();
     renderLastMove();
+    renderCapturedPanels();
     updateTurnText();
     flashTurn();
 }
@@ -414,7 +415,55 @@ function resetGame() {
     clearHighlights();
     renderPieces();
     renderLastMove();
+    renderCapturedPanels();
     updateTurnText();
 }
 
 document.getElementById("restart").addEventListener("click", resetGame);
+
+
+function capturePanelFor(color) {
+    return document.getElementById(color === "white" ? "white-captures" : "black-captures");
+}
+
+function capturedBy(color) {
+    return capturedPieces.filter((piece) => piece.capturedBy === color);
+}
+
+function renderCapturePanel(color) {
+    const panel = capturePanelFor(color);
+    const captured = capturedBy(color);
+    const pawnVictimColor = color === "white" ? "black" : "white";
+    const capturedPawns = captured
+        .filter((piece) => piece.type === "pawn")
+        .sort((first, second) => fileLetters.indexOf(first.pawnFile) - fileLetters.indexOf(second.pawnFile));
+    const symbolsElement = panel.querySelector('[data-role="symbols"]');
+    const pawnCountElement = panel.querySelector('[data-role="pawn-count"]');
+    const pawnNamesElement = panel.querySelector('[data-role="pawn-names"]');
+
+    symbolsElement.replaceChildren();
+
+    if (captured.length === 0) {
+        const empty = document.createElement("span");
+        empty.className = "empty-captures";
+        empty.textContent = "No pieces captured";
+        symbolsElement.appendChild(empty);
+    } else {
+        captured.forEach((piece) => {
+            const item = document.createElement("span");
+            item.textContent = symbols[piece.color][piece.type];
+            item.title = piece.type === "pawn" ? `${piece.pawnFile}-pawn` : `${piece.color} ${piece.type}`;
+            symbolsElement.appendChild(item);
+        });
+    }
+
+    pawnCountElement.textContent = `${pawnVictimColor === "white" ? "White" : "Black"} pawns lost: ${capturedPawns.length}/8`;
+    pawnNamesElement.textContent = `Pawns: ${capturedPawns.length ? capturedPawns.map((piece) => `${piece.pawnFile}-pawn`).join(", ") : "none"}`;
+}
+
+function renderCapturedPanels() {
+    renderCapturePanel("white");
+    renderCapturePanel("black");
+}
+
+renderCapturedPanels();

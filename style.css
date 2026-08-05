@@ -196,3 +196,73 @@ body {
         margin-left: 29px;
     }
 }
+
+.capture-panel {
+    width: 220px;
+    min-height: 180px;
+    margin-top: 58px;
+    padding: 14px;
+    border: 1px solid #111;
+    border-radius: 5px;
+    background: rgba(255, 255, 255, 0.92);
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.28);
+}
+
+.capture-panel h2 {
+    margin: 0 0 12px;
+    padding-bottom: 7px;
+    border-bottom: 2px solid #555;
+    font-size: 17px;
+    text-align: center;
+}
+
+.captured-symbols {
+    min-height: 52px;
+    display: flex;
+    flex-wrap: wrap;
+    align-content: flex-start;
+    gap: 4px;
+    color: #333;
+    font-family: "Times New Roman", Georgia, serif;
+    font-size: 30px;
+}
+
+.captured-symbols .empty-captures {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+.pawn-count,
+.pawn-names {
+    margin: 10px 0 0;
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+.pawn-count {
+    font-weight: 700;
+}
+
+@media (max-width: 1020px) {
+    .page-shell {
+        flex-wrap: wrap;
+    }
+
+    #game {
+        order: 1;
+        flex-basis: 100%;
+    }
+
+    .capture-panel {
+        order: 2;
+        width: min(300px, 46vw);
+        margin-top: 0;
+    }
+}
+
+@media (max-width: 620px) {
+    .capture-panel {
+        width: 100%;
+    }
+}
