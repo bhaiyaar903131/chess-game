@@ -166,6 +166,7 @@ function getMoves(piece) {
 function clearHighlights() {
     document.querySelectorAll(".gamecell").forEach((cell) => {
         cell.classList.remove("selected", "green", "capture-target");
+        cell.setAttribute("aria-pressed", "false");
     });
 }
 
@@ -175,6 +176,7 @@ function showMoves(piece) {
 
     const selectedCell = document.getElementById(squareKey(piece.x, piece.y));
     selectedCell.classList.add("selected");
+    selectedCell.setAttribute("aria-pressed", "true");
     legalTargets.forEach((move) => {
         const cell = document.getElementById(squareKey(move.x, move.y));
         cell.classList.add("green");
@@ -467,3 +469,19 @@ function renderCapturedPanels() {
 }
 
 renderCapturedPanels();
+
+
+boardElement.addEventListener("keydown", (event) => {
+    const cell = event.target.closest(".gamecell");
+    if (!cell || (event.key !== "Enter" && event.key !== " ")) {
+        return;
+    }
+
+    event.preventDefault();
+    cell.click();
+});
+
+window.addEventListener("load", () => {
+    updateTurnText();
+    renderCapturedPanels();
+});
