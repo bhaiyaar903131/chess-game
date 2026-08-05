@@ -9,13 +9,25 @@
 <body>
     <div class="page-shell">
 
+        <aside class="capture-panel" id="white-captures" aria-live="polite">
+            <h2>Captured by White</h2>
+            <div class="captured-symbols" data-role="symbols">No pieces captured</div>
+            <p class="pawn-count" data-role="pawn-count">Black pawns lost: 0/8</p>
+            <p class="pawn-names" data-role="pawn-names">Pawns: none</p>
+        </aside>
         <main id="game">
             <div id="board" aria-label="Chess board"></div>
             <div id="turn" aria-live="polite">It's Whites Turn!</div>
-            
-            
+            <button id="restart" type="button">New Game</button>
+            <p class="help-text">Click one of your pieces, then click a green square. White moves first.</p>
         </main>
 
+        <aside class="capture-panel" id="black-captures" aria-live="polite">
+            <h2>Captured by Black</h2>
+            <div class="captured-symbols" data-role="symbols">No pieces captured</div>
+            <p class="pawn-count" data-role="pawn-count">White pawns lost: 0/8</p>
+            <p class="pawn-names" data-role="pawn-names">Pawns: none</p>
+        </aside>
     </div>
     <script src="script.js"></script>
 </body>
